@@ -11,6 +11,7 @@ Server::Server(unsigned short port) {
 
 	bottleserve.set_message_handler([this] (websocketpp::connection_hdl hdl, message_ptr msg) {
 		bottleserve.send(hdl, msg->get_payload(), msg->get_opcode());
+        std::cout << msg->get_raw_payload() << std::endl;
 	});
 
 	bottleserve.listen(port);
