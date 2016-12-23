@@ -1,0 +1,12 @@
+<html>
+	<head><title>Tester</title></head>
+	<body>
+	<script type="text/javascript">
+var socket = new WebSocket("ws://localhost:8000");
+socket.onmessage = function(event) {
+	document.write(event.data);
+	document.write("<br>");
+};
+	</script>
+	</body>
+</html>
