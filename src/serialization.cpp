@@ -8,9 +8,18 @@ using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
 
+namespace {
+    ptree parse(const string& in) {
+        ptree tree;
+        stringstream stream;
+        stream << in;
+        read_json(stream, tree);
+        return tree;
+    }
+}
+
 Profile Serializer::to_profile(const string &serialized) {
-    ptree tree;
-    read_json(serialized, tree);
+    auto tree = parse(serialized);
     Profile result;
     result.id = tree.get<string>("id");
     result.name = tree.get<string>("name");
@@ -31,8 +40,7 @@ string Serializer::from(const Profile &profile) {
 }
 
 Game Serializer::to_game(const std::string &serialized) {
-    ptree tree;
-    read_json(serialized, tree);
+    auto tree = parse(serialized);
     Game result;
     result.id = tree.get<string>("id");
     result.player1 = tree.get<string>("player1");
