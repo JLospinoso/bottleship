@@ -3,7 +3,7 @@
 #include <vector>
 #include <array>
 
-typedef unsigned long long DocumentId;
+typedef std::string DocumentId;
 
 struct Profile {
     DocumentId id;

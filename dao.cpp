@@ -14,6 +14,11 @@ using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
 
+// Document IDs (UUIDs)
+#include <boost/uuid/uuid.hpp>            // uuid class
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+
 using namespace std;
 namespace {
     void json_stuff() {
@@ -40,15 +45,47 @@ namespace {
         return buf.str();
     }
 
-
-    void check_status(leveldb::Status &status, const std::string& db_name) {
-        if (!status.ok())
-        {
-            cerr << "Unable to open/create " << db_name << endl;
-            cerr << status.ToString() << endl;
-            throw exception();
+    struct LevelDb {
+        LevelDb(const string& file) : name(file) {
+            leveldb::Options options;
+            options.create_if_missing = true;
+            check_status(leveldb::DB::Open(options, file, &db), "LevelDb()");
         }
-    }
+        ~LevelDb(){
+            delete db;
+        }
+        std::string read(DocumentId id) {
+            string result;
+            check_status(db->Get(read_options, id, &result), "read");
+            return result;
+        }
+        void update(DocumentId id, const std::string &value) {
+            check_status(db->Put(write_options, id, value), "update");
+        }
+        void remove(DocumentId id) {
+            check_status(db->Delete(write_options, id), "remove");
+        }
+        void check_status(const leveldb::Status &status, const string &info) const {
+            if (!status.ok())
+            {
+                string err("(");
+                err.append(name);
+                err.append(name);
+                err.append(") ");
+                err.append(info);
+                err.append(": ");
+                err.append(status.ToString());
+                throw DaoException(info);
+            }
+        }
+    private:
+        LevelDb(const LevelDb&) = delete;
+        LevelDb& operator=(const LevelDb&) = delete;
+        leveldb::DB *db;
+        leveldb::ReadOptions read_options;
+        leveldb::WriteOptions write_options;
+        const string name;
+    };
 }
 
 /*
@@ -59,67 +96,81 @@ namespace {
  */
 
 struct DaoImpl {
-    DaoImpl(const string &game_file, const string &profile_file) {
-        leveldb::Options options;
-        options.create_if_missing = true;
-
-        auto profile_status = leveldb::DB::Open(options, profile_file, &profile_db);
-        check_status(profile_status, profile_file);
-
-        auto game_status = leveldb::DB::Open(options, game_file, &game_db);
-        check_status(game_status, game_file);
+    DaoImpl(const string &game_file, const string &profile_file)
+            : profiles(profile_file), games(game_file) {
     }
-    ~DaoImpl() {
-        if(profile_db) {
-            delete profile_db;
+    Profile& save_profile(Profile& profile) {
+        if(profile.id.empty()) {
+            profile.id = to_string(uuid_gen());
         }
-        if(game_db) {
-            delete game_db;
+        string serialized_profile;
+        //TODO: Serialization
+        profiles.update(profile.id, serialized_profile);
+        return profile;
+    }
+    Profile get_profile(DocumentId id) {
+        Profile result;
+        auto serialized_profile = profiles.read(id);
+        //TODO: Deserialize
+        return Profile();
+    }
+    Game& save_game(Game& game) {
+        if(game.id.empty()) {
+            game.id = to_string(uuid_gen());
         }
+        string serialized_game;
+        //TODO: Serialization
+        games.update(game.id, serialized_game);
+        return game;
     }
-
-    void update_profile(DocumentId id, const std::string &value) {
-        profile_db->Put(write_options, to_string(id), value);
+    Game get_game(DocumentId id) {
+        Game result;
+        auto serialized_game = games.read(id);
+        //TODO: Deserialize
+        return Game();
     }
-
-    std::string get_profile(DocumentId id) {
-        std::string result;
-        profile_db->Get(read_options, to_string(id), &result);
-        return result;
-    }
-
-    leveldb::ReadOptions read_options;
-    leveldb::WriteOptions write_options;
-    leveldb::DB *profile_db, *game_db;
+private:
+    boost::uuids::random_generator uuid_gen;
+    LevelDb profiles, games;
 };
 
-DocumentId Dao::update_game(const Game &game) {
-    //TODO
-    return 0;
+Game& Dao::update_game(Game &game) {
+    return impl->save_game(game);
 }
 
-DocumentId Dao::update_profile(const Profile &profile) {
-    std::string profile_json;
-    //TODO: Serialize game...
-    //TODO: Deal with uninitialized game id, i.e. a new profile
-    impl->update_profile(profile.id, profile_json);
-    return 0;
+Profile& Dao::update_profile(Profile &profile) {
+    return impl->save_profile(profile);
 }
 
 Game Dao::get_game(DocumentId id) {
-    return Game();
+    return impl->get_game(id);
 }
 
 Profile Dao::get_profile(DocumentId id) {
-    auto profile_json = impl->get_profile(id);
-    //TODO: Deerialize profile...
-    return Profile();
+    return impl->get_profile(id);
 }
 
 Dao::~Dao() {
-
+    if(impl != nullptr) {
+        delete impl;
+    }
 }
 
 Dao::Dao(const string &game_file, const string &profile_file) {
-    impl = make_unique<DaoImpl>(game_file, profile_file); //TODO: Probably makes sense to split out into two impl's, one for profile, one for game.
+    impl = new DaoImpl(game_file, profile_file);
 }
+
+Dao::Dao(Dao &&other) {
+    impl = other.impl;
+    other.impl = nullptr;
+}
+
+Dao &Dao::operator=(Dao &&other) {
+    if(impl != nullptr) {
+        delete impl;
+    }
+    impl = other.impl;
+    other.impl = nullptr;
+}
+
+DaoException::DaoException(const string &__arg) : runtime_error(__arg) {}
