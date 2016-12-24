@@ -4,6 +4,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include "serialization.h"
+#include <mutex>
 
 using namespace std;
 namespace {
@@ -17,14 +18,17 @@ namespace {
             delete db;
         }
         std::string read(DocumentId id) {
+            lock_guard<mutex> lock(rw_mutex);
             string result;
             check_status(db->Get(read_options, id, &result), "read");
             return result;
         }
         void update(DocumentId id, const std::string &value) {
+            lock_guard<mutex> lock(rw_mutex);
             check_status(db->Put(write_options, id, value), "update");
         }
         void remove(DocumentId id) {
+            lock_guard<mutex> lock(rw_mutex);
             check_status(db->Delete(write_options, id), "remove");
         }
         void check_status(const leveldb::Status &status, const string &info) const {
@@ -47,6 +51,7 @@ namespace {
         leveldb::ReadOptions read_options;
         leveldb::WriteOptions write_options;
         const string name;
+        std::mutex rw_mutex;
     };
 }
 
