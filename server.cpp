@@ -39,6 +39,9 @@ Server::Server(unsigned short port) {
 
     bottleserve.init_asio();
 
+    //TODO: unqlite here
+    dao.do_stuff();
+
     bottleserve.set_message_handler([this] (websocketpp::connection_hdl hdl, message_ptr msg) {
         using namespace websocketpp;
         if(msg->get_opcode() != frame::opcode::text) {
