@@ -2,14 +2,14 @@ cmake_minimum_required (VERSION 3.1)
 project (bottleship)
 
 set (bottleship_SOURCES
-	main.cpp
-	server.cpp
+		main.cpp
+		server.cpp
         dao.cpp
-)
+		serialization.cpp)
 set (bottleship_HEADERS
-	server.h
+		server.h
         dao.h
-)
+		serialization.h)
 
 find_package (Threads)
 find_package (Boost COMPONENTS system filesystem REQUIRED)

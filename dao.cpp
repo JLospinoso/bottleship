@@ -1,50 +1,12 @@
 #include "dao.h"
-
-// LevelDB examples
 #include "leveldb/db.h"
-#include <iostream>
-#include <sstream>
-
-// JSON examples
-#include <map>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
-using boost::property_tree::ptree;
-using boost::property_tree::read_json;
-using boost::property_tree::write_json;
-
-// Document IDs (UUIDs)
-#include <boost/uuid/uuid.hpp>            // uuid class
-#include <boost/uuid/uuid_generators.hpp> // generators
-#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include "serialization.h"
 
 using namespace std;
 namespace {
-    void json_stuff() {
-        // Write json.
-        ptree pt;
-        pt.put ("foo", "bar");
-        std::ostringstream buf;
-        write_json (buf, pt, false);
-        std::string json = buf.str(); // {"foo":"bar"}
-
-        // Read json.
-        ptree pt2;
-        std::istringstream is (json);
-        read_json (is, pt2);
-        std::string foo = pt2.get<std::string> ("foo");
-    }
-
-    std::string map2json (const std::map<std::string, std::string>& map) {
-        ptree pt;
-        for (auto& entry: map)
-            pt.put (entry.first, entry.second);
-        std::ostringstream buf;
-        write_json (buf, pt, false);
-        return buf.str();
-    }
-
     struct LevelDb {
         LevelDb(const string& file) : name(file) {
             leveldb::Options options;
@@ -88,13 +50,6 @@ namespace {
     };
 }
 
-/*
- * TODO: As a provisional approach, we can use LevelDB as a documentDB. Keys can be DocumentIds, values
- * can be JSON representations of the objects. All the classes in common.h map very easily to JSON, so it
- * should be straightforward:
- *
- */
-
 struct DaoImpl {
     DaoImpl(const string &game_file, const string &profile_file)
             : profiles(profile_file), games(game_file) {
@@ -103,35 +58,32 @@ struct DaoImpl {
         if(profile.id.empty()) {
             profile.id = to_string(uuid_gen());
         }
-        string serialized_profile;
-        //TODO: Serialization
+        auto serialized_profile = serializer.from(profile);
         profiles.update(profile.id, serialized_profile);
         return profile;
     }
     Profile get_profile(DocumentId id) {
         Profile result;
         auto serialized_profile = profiles.read(id);
-        //TODO: Deserialize
-        return Profile();
+        return serializer.to_profile(serialized_profile);
     }
     Game& save_game(Game& game) {
         if(game.id.empty()) {
             game.id = to_string(uuid_gen());
         }
-        string serialized_game;
-        //TODO: Serialization
+        auto serialized_game = serializer.from(game);
         games.update(game.id, serialized_game);
         return game;
     }
     Game get_game(DocumentId id) {
         Game result;
         auto serialized_game = games.read(id);
-        //TODO: Deserialize
-        return Game();
+        return serializer.to_game(serialized_game);
     }
 private:
     boost::uuids::random_generator uuid_gen;
     LevelDb profiles, games;
+    Serializer serializer;
 };
 
 Game& Dao::update_game(Game &game) {

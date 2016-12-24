@@ -1,6 +1,5 @@
 #pragma once
 #include "common.h"
-#include <memory>
 
 struct DaoImpl;
 struct DaoException : public std::runtime_error {
@@ -21,7 +20,7 @@ struct Dao {
     Profile get_profile(DocumentId id);
 
     /*
-     * TODO: Implement something like:
+     * TODO: Implement iterators. This is easily done on the LevelDB side and would be useful for analytics.
     InputIterator<Profile> get_profiles();
     InputIterator<Game> get_profiles();
      */
