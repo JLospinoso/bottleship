@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include "dao.h"
 #include <boost/filesystem.hpp>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -122,4 +124,32 @@ TEST_F(DaoTest, dao_will_create_new_profile_for_new_name) {
     auto retrieved = dao.get_profile(profile.id);
 
     ASSERT_EQ(profile.name, retrieved.name);
+}
+
+TEST_F(DaoTest, dao_can_iterate_over_profiles) {
+    auto profiles_fn = get_temp();
+    auto games_fn = get_temp();
+    DocumentId expectedDocumentId;
+    {
+        Dao dao(profiles_fn, games_fn);
+        Profile a, b, c;
+        a.name = "Name A";
+        b.name = "Name B";
+        c.name = "Name C";
+        dao.update_profile(a);
+        dao.update_profile(b);
+        dao.update_profile(c);
+        expectedDocumentId = b.id;
+    }
+
+    Dao dao(profiles_fn, games_fn);
+    Profile d;
+    d.name = "Name D";
+    dao.update_profile(d);
+    vector<string> retrieved_names;
+    dao.for_each_profile([&retrieved_names](const Profile& p){
+        retrieved_names.push_back(p.name);
+    });
+    sort(retrieved_names.begin(), retrieved_names.end());
+    ASSERT_EQ(vector<string>({"Name A", "Name B", "Name C", "Name D"}), retrieved_names);
 }
