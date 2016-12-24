@@ -5,7 +5,9 @@ set (bottleship_SOURCES
         src/server.cpp
         src/dao.cpp
         src/serialization.cpp)
-set(bottleship_TEST_FILES tests/serialization_test.cpp)
+set(bottleship_TEST_FILES
+        tests/serialization_test.cpp
+        tests/dao_test.cpp)
 
 add_subdirectory(leveldb)
 add_subdirectory(googletest)
@@ -21,7 +23,7 @@ add_executable(bottleship src/main.cpp ${bottleship_SOURCES})
 add_executable(tst ${bottleship_SOURCES} ${bottleship_TEST_FILES})
 
 target_link_libraries(bottleship ${Boost_SYSTEM_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} leveldb)
-target_link_libraries(tst ${Boost_SYSTEM_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} leveldb gmock gtest gtest_main)
+target_link_libraries(tst ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} leveldb gmock gtest gtest_main)
 
 include_directories(${WEBSOCKETPP_INCLUDE_DIR})
 include_directories(leveldb/include)
