@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "serialization.h"
 
 TEST(test, sample_fails)
 {
