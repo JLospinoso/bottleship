@@ -129,7 +129,6 @@ TEST_F(DaoTest, dao_will_create_new_profile_for_new_name) {
 TEST_F(DaoTest, dao_can_iterate_over_profiles) {
     auto profiles_fn = get_temp();
     auto games_fn = get_temp();
-    DocumentId expectedDocumentId;
     {
         Dao dao(profiles_fn, games_fn);
         Profile a, b, c;
@@ -139,7 +138,6 @@ TEST_F(DaoTest, dao_can_iterate_over_profiles) {
         dao.update_profile(a);
         dao.update_profile(b);
         dao.update_profile(c);
-        expectedDocumentId = b.id;
     }
 
     Dao dao(profiles_fn, games_fn);
@@ -152,4 +150,30 @@ TEST_F(DaoTest, dao_can_iterate_over_profiles) {
     });
     sort(retrieved_names.begin(), retrieved_names.end());
     ASSERT_EQ(vector<string>({"Name A", "Name B", "Name C", "Name D"}), retrieved_names);
+}
+
+TEST_F(DaoTest, dao_can_iterate_over_games) {
+    auto profiles_fn = get_temp();
+    auto games_fn = get_temp();
+    {
+        Dao dao(profiles_fn, games_fn);
+        Game a, b, c;
+        a.player1 = "Player A";
+        b.player1 = "Player B";
+        c.player1 = "Player C";
+        dao.update_game(a);
+        dao.update_game(b);
+        dao.update_game(c);
+    }
+
+    Dao dao(profiles_fn, games_fn);
+    Game d;
+    d.player1 = "Player D";
+    dao.update_game(d);
+    vector<string> retrieved_players;
+    dao.for_each_game([&retrieved_players](const Game& g){
+        retrieved_players.push_back(g.player1);
+    });
+    sort(retrieved_players.begin(), retrieved_players.end());
+    ASSERT_EQ(vector<string>({"Player A", "Player B", "Player C", "Player D"}), retrieved_players);
 }
