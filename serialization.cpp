@@ -8,35 +8,8 @@ using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
 
-namespace {
-    void json_stuff() {
-        // Write json.
-        ptree pt;
-        pt.put("foo", "bar");
-        ostringstream buf;
-        write_json(buf, pt, false);
-        string json = buf.str(); // {"foo":"bar"}
-
-        // Read json.
-        ptree pt2;
-        istringstream is(json);
-        read_json(is, pt2);
-        string foo = pt2.get<string>("foo");
-    }
-
-    string map2json(const map<string, string> &map) {
-        ptree pt;
-        for (auto &entry: map)
-            pt.put(entry.first, entry.second);
-        ostringstream buf;
-        write_json(buf, pt, false);
-        return buf.str();
-    }
-}
-
 Profile Serializer::to_profile(const string &serialized) {
     ptree tree;
-    //istringstream is(serialized);
     read_json(serialized, tree);
     Profile result;
     result.id = tree.get<string>("id");
@@ -47,13 +20,38 @@ Profile Serializer::to_profile(const string &serialized) {
 }
 
 string Serializer::from(const Profile &profile) {
-    return "";
-}
-
-std::string Serializer::from(const Game &game) {
-    return "";
+    ptree tree;
+    tree.put("id", profile.id);
+    tree.put("name", profile.name);
+    tree.put("password", profile.password);
+    //TODO: Games
+    ostringstream stream;
+    write_json(stream, tree, false);
+    return stream.str();
 }
 
 Game Serializer::to_game(const std::string &serialized) {
-    return Game();
+    ptree tree;
+    read_json(serialized, tree);
+    Game result;
+    result.id = tree.get<string>("id");
+    result.player1 = tree.get<string>("player1");
+    result.player2 = tree.get<string>("player2");
+    result.status = Game::Status(tree.get<int>("status"));
+    //TODO: Boards
+    //TODO: Shots
+    return result;
+}
+
+std::string Serializer::from(const Game &game) {
+    ptree tree;
+    tree.put("id", game.id);
+    tree.put("player1", game.player1);
+    tree.put("player2", game.player2);
+    tree.put("status", game.status);
+    //TODO: Boards
+    //TODO: Shots
+    ostringstream stream;
+    write_json(stream, tree, false);
+    return stream.str();
 }
