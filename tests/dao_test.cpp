@@ -75,3 +75,51 @@ TEST_F(DaoTest, dao_can_roundtrip_profile) {
     ASSERT_EQ(profile.name, result.name);
     ASSERT_EQ(profile.password, result.password);
 }
+
+TEST_F(DaoTest, dao_can_retrieve_profile_by_name) {
+    Dao dao(get_temp(), get_temp());
+    Profile a, b, c;
+    a.name = "Name A";
+    b.name = "Name B";
+    c.name = "Name C";
+    dao.update_profile(a);
+    dao.update_profile(b);
+    dao.update_profile(c);
+
+    auto result = dao.get_profile_by_name("Name B");
+
+    ASSERT_EQ(b.id, result.id);
+}
+
+TEST_F(DaoTest, dao_can_retrieve_profile_by_name_with_old_db) {
+    auto profiles_fn = get_temp();
+    auto games_fn = get_temp();
+    DocumentId expectedDocumentId;
+    {
+        Dao dao(profiles_fn, games_fn);
+        Profile a, b, c;
+        a.name = "Name A";
+        b.name = "Name B";
+        c.name = "Name C";
+        dao.update_profile(a);
+        dao.update_profile(b);
+        dao.update_profile(c);
+        expectedDocumentId = b.id;
+    }
+
+    Dao new_dao(profiles_fn, games_fn);
+    Profile d;
+    d.name = "Name D";
+    auto result = new_dao.get_profile_by_name("Name B");
+
+    ASSERT_EQ(expectedDocumentId, result.id);
+}
+
+TEST_F(DaoTest, dao_will_create_new_profile_for_new_name) {
+    Dao dao(get_temp(), get_temp());
+    auto profile = dao.get_profile_by_name("new name");
+
+    auto retrieved = dao.get_profile(profile.id);
+
+    ASSERT_EQ(profile.name, retrieved.name);
+}

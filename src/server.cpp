@@ -4,32 +4,40 @@
 #include "server.h"
 
 using namespace std;
-
+namespace {
 /*
  * Splits a string based on a delimiter character
  *
  * Won't split into more than 'max' strings. Returns the number of strings that were added
  */
-template<typename Iter>
-size_t split(const string& str, char val, size_t max, Iter out) {
-    stringstream ss(str);
-    string s;
-    size_t len = 0;
+    template<typename Iter>
+    size_t split(const string& str, char val, size_t max, Iter out) {
+        stringstream ss(str);
+        string s;
+        size_t len = 0;
 
-    // I love the "goes to" operator (-->)
-    while( max --> 0 ) {
-        if(!getline(ss, s, max ? val : '\0')) {
-            return len;
+        // I love the "goes to" operator (-->)
+        while( max --> 0 ) {
+            if(!getline(ss, s, max ? val : '\0')) {
+                return len;
+            }
+            len++;
+            *out++ = s;
         }
-        len++;
-        *out++ = s;
+        return len;
     }
-    return len;
 }
 
-bool valid_user(const string& user, const string& pass) {
-    // TODO: Actually check the username and password here
-    return user == "anon" || (user == "corny" && pass == "1234");
+bool Server::valid_user(const string& user, const string& pass) {
+    auto profile = dao.get_profile_by_name(user);
+    if(profile.password.empty()) {
+        // DAO will return a new profile with empty fields (except user).
+        // Fill in the given password, save, and return as valid login.
+        profile.password = pass;
+        dao.update_profile(profile);
+        return true;
+    }
+    return profile.password == pass;
 }
 
 Server::Server(unsigned short port) {
