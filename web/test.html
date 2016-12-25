@@ -46,6 +46,7 @@
                 alert.text("You are disconnected from " + event.target.url);
                 alert.removeClass("alert-success");
                 alert.addClass("alert-danger");
+                printToTerminal(`Disconnected: ${event.reason}`)
             };
             socket.onmessage = function(event) {
                 printToTerminal(`${event.origin}: ${event.data}`);

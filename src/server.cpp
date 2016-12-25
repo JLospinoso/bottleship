@@ -28,16 +28,9 @@ namespace {
     }
 }
 
-bool Server::valid_user(const string& user, const string& pass) {
-    auto profile = dao.get_profile_by_name(user);
-    if(profile.password.empty()) {
-        // DAO will return a new profile with empty fields (except user).
-        // Fill in the given password, save, and return as valid login.
-        profile.password = pass;
-        dao.update_profile(profile);
-        return true;
-    }
-    return profile.password == pass;
+Server::~Server() {
+    bottleserve.stop_listening();
+    bottleserve.stop();
 }
 
 Server::Server(unsigned short port) {
@@ -53,18 +46,36 @@ Server::Server(unsigned short port) {
             bottleserve.close(hdl, close::status::unsupported_data, "Only text data allowed");
             return;
         }
-        const auto & line = msg->get_payload();
 
+        // Step 1: Check if `hdl` is known. Not sure if we want to store a map of DocumentId to HDL
+        //         If `hdl` is known, user is already logged in and we can dispatch the message, e.g.
+        // auto connection_iter = connections.find(hdl);
+        // if(connection_iter != connections.end()) // ...
+        // const auto& profile = connection_iter->second;
+        // dispatch(hdl, profile, msg->get_payload());
+        // return;
+
+        // Step 2: Unknown connection. Attempt to log the user in:
+        const auto & line = msg->get_payload();
         array<string,3> login;
-        if(login.size() != split(line, ' ', login.size(), login.begin())
-           || login[0] != "login"
-           || !valid_user(login[1], login[2])) {
-            bottleserve.close(hdl, close::status::unsupported_data, "Invalid login");
+        if(login.size() != split(line, ' ', login.size(), login.begin()) || login[0] != "login") {
+            bottleserve.close(hdl, close::status::unsupported_data, "You must login.");
             return;
         }
+        auto new_profile = dao.get_profile_by_name(login[1]);
+        if(new_profile.password.empty()) {
+            // DAO will return a new profile with empty fields (except user).
+            // Fill in the given password, save, and return as valid login.
+            new_profile.password = login[2];
+            dao.update_profile(new_profile);
+        }
+        if(new_profile.password != login[2]) {
+            bottleserve.close(hdl, close::status::unsupported_data, "Incorrect password.");
+            return;
+        }
+        // store the hdl to DocumentId
 
-        // TODO: Create a connection
-
+        // Step 3: Just for echo testing...
         bottleserve.send(hdl, msg->get_payload(), msg->get_opcode());
         cout << msg->get_opcode() << endl;
         cout << msg->get_raw_payload() << endl;
