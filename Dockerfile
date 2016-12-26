@@ -5,7 +5,7 @@ WORKDIR /opt/bottleship/
 RUN git clone https://github.com/google/googletest.git
 RUN git clone https://github.com/google/leveldb.git
 RUN apt-get install cmake g++ -y
-RUN apt-get install libboost-system-dev libboost-filesystem-dev -y
+RUN apt-get install libboost-system-dev libboost-filesystem-dev libwebsocketpp-dev -y
 COPY . /opt/bottleship/
 RUN mkdir build
 WORKDIR /opt/bottleship/build
