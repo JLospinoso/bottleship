@@ -9,4 +9,4 @@ dependencies:
 
 test:
   override:
-    - docker run tst
+    - docker run bottleship:latest tst
