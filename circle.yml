@@ -9,4 +9,4 @@ dependencies:
 
 test:
   override:
-    - ./tst
+    - docker run --rm jaarky/bottleship /bottleship/bin/tst
