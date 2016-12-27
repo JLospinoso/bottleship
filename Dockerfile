@@ -6,11 +6,11 @@ RUN mkdir /bottleship/bin
 RUN mkdir /bottleship/build
 RUN git clone https://github.com/google/googletest.git /bottleship/googletest
 RUN git clone https://github.com/google/leveldb.git /bottleship/leveldb
-WORKDIR bottleship/build
+WORKDIR /bottleship/build
 COPY . /bottleship
 RUN cmake ..
 RUN make
-RUN cp bottleship ../bin
-RUN cp tst ../bin
+RUN cp bottleship /bottleship/bin
+RUN cp tst /bottleship/bin
 WORKDIR /bottleship/bin
 ENTRYPOINT /bottleship/bin/bottleship
