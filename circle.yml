@@ -5,8 +5,8 @@ machine:
 dependencies:
   override:
     - docker info
-    - docker build --rm=false -t jaarky/bottleship .
+    - docker build --rm=false -t jaarky/bottleship:latest .
 
 test:
   override:
-    - docker run --rm jaarky/bottleship /bottleship/bin/tst
+    - docker run jaarky/bottleship:latest /bottleship/bin/tst
