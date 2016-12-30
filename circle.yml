@@ -1,3 +1,10 @@
+compile:
+  override:
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
+
 test:
   post:
     - ./tst
