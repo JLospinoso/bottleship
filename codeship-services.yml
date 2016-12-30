@@ -1,0 +1,3 @@
+bottleship:
+  build:
+    dockerfile_path: Dockerfile
