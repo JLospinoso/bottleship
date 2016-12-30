@@ -12,7 +12,7 @@ There are two components to Bottleship: the game server and the client. You may 
 Docker container, e.g.:
 
 ```sh
-docker run quay.io/jaarky/bottleship:latest ./bottleship
+docker run -p 8000:8000 quay.io/jaarky/bottleship:latest ./bottleship
 ```
 
 By default, `bottleship` listens on `:8000`. You may interact with the gameserver with the [web client](http://htmlpreview.github.io/?https://raw.githubusercontent.com/jaarky/bottleship/master/web/test.html).
