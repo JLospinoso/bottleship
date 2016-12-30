@@ -1,9 +1,6 @@
 cmake_minimum_required (VERSION 3.1)
 project (bottleship)
 
-# Statically compile boost (for easier cross-linuxes)
-set(Boost_USE_STATIC_LIBS   ON)
-
 # Download and unpack googletest at configure time
 configure_file(cmake/gtest/CMakeLists.txt.in cmake/gtest/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
