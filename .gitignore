@@ -1,4 +1,8 @@
 /bottleship
+/tst
+/cmake/gtest/CMakeLists.txt
+/cmake/gtest/googletest-prefix
+/googletest-src
 
 # Created by https://www.gitignore.io/api/c++,cmake,vim
 
