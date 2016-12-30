@@ -10,7 +10,8 @@ compile:
   override:
     - docker build --rm=false -t jaarky/bottleship:latest .
     - docker cp $(docker create jaarky/bottleship:latest):/bottleship/bin - > $CIRCLE_ARTIFACTS/bin.tar
+    - docker rm -f $(docker ps -l -q)
 
 test:
   override:
-    - echo "Hello, world!"
+    - docker run jaarky/bottleship:latest ./tst

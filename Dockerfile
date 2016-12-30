@@ -5,10 +5,13 @@ RUN mkdir /bottleship
 RUN mkdir /bottleship/bin
 RUN mkdir /bottleship/build
 WORKDIR /bottleship/build
-COPY . /bottleship
+COPY cmake /bottleship/cmake
+COPY include /bottleship/include
+COPY src /bottleship/src
+COPY tests /bottleship/tests
+COPY CMakeLists.txt /bottleship
 RUN cmake ..
 RUN make
 RUN cp bottleship /bottleship/bin
 RUN cp tst /bottleship/bin
 WORKDIR /bottleship/bin
-ENTRYPOINT /bottleship/bin/bottleship
