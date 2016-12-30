@@ -5,6 +5,21 @@ Bottleship is a Battleship-style game engine written in Modern C++. It is under 
 
 For information about the protocol, see [The Bottleship Protocol](https://github.com/jaarky/bottleship/wiki/The-Bottleship-Protocol).
 
+Experimenting with Bottleship
+==
+
+There are two components to Bottleship: the game server and the client. You may setup a game server with the published
+Docker container, e.g.:
+
+```sh
+docker run quay.io/jaarky/bottleship:latest ./bottleship
+```
+
+By default, `bottleship` listens on `:8000`. You may interact with the gameserver with the [web client](http://htmlpreview.github.io/?https://raw.githubusercontent.com/jaarky/bottleship/master/web/test.html).
+
+Getting Involved
+==
+
 If you would like to get involved, join us on Gitter! [![Join the chat at https://gitter.im/boship/Lobby](https://badges.gitter.im/boship/Lobby.svg)](https://gitter.im/boship/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Containers
