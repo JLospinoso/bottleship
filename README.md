@@ -24,7 +24,8 @@ If you would like to get involved, join us on Gitter! [![Join the chat at https:
 
 Containers
 ==
-* quay.io: [![Docker Repository on Quay](https://quay.io/repository/jaarky/bottleship/status "Docker Repository on Quay")](https://quay.io/repository/jaarky/bottleship)
+* Docker Hub - `docker pull jaarky/bottleship` [![Docker Automated buil](https://img.shields.io/docker/automated/jaarky/bottleship.svg)](https://hub.docker.com/r/jaarky/bottleship/)
+* quay.io - `docker pull quay.io/jaarky/bottleship` [![Docker Repository on Quay](https://quay.io/repository/jaarky/bottleship/status "Docker Repository on Quay")](https://quay.io/repository/jaarky/bottleship)
 
 CircleCI
 ==
