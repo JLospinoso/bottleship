@@ -1,9 +1,8 @@
 compile:
   override:
-    - mkdir build
-    - cd build
-    - cmake ..
-    - make
+    - sudo apt-get install git cmake g++ libboost-system-dev libboost-filesystem-dev libwebsocketpp-dev -y
+    - cmake .
+
 
 test:
   post:
