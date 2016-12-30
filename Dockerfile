@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install git cmake g++ libboost-system-dev libboost-filesystem-dev libwebsockets-dev -y
+RUN apt-get install git cmake g++ libboost-system-dev libboost-filesystem-dev libwebsocketpp-dev -y
 RUN mkdir /bottleship
 RUN mkdir /bottleship/bin
 RUN mkdir /bottleship/build
