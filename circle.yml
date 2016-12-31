@@ -1,9 +1,8 @@
-compile:
+machine:
+  services:
+    - docker
+
+dependencies:
   override:
-    - sudo apt-get install git cmake g++ libboost-system-dev libboost-filesystem-dev libwebsocketpp-dev -y
-    - cmake .
-
-
-test:
-  post:
-    - ./tst
+    - docker info
+    - docker build --rm=false -t jaarky/bottleship:latest .
