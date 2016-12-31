@@ -6,7 +6,3 @@ dependencies:
   override:
     - docker info
     - docker build --rm=false -t jaarky/bottleship:latest .
-
-test:
-  override:
-    - docker run jaarky/bottleship:latest /bottleship/bin/tst
