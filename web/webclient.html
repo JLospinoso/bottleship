@@ -28,6 +28,17 @@
         .text-center {
             text-align: center;
         }
+		.full {
+			background: url('bg.jpg') no-repeat center center fixed;
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			background-size: cover;
+			-o-background-size: cover;
+		}
+		.jumbotron {
+		   background: rgb(236, 238, 239); /* This is for ie8 and below */
+		   background: rgba(236, 238, 239, 0.75); 
+		}
     </style>
 
     <script>
@@ -65,6 +76,7 @@
             printToTerminal = function(x) {
                 term.echo(x);
             };
+			$('html, body').animate({scrollTop: $(document).height()}, 'slow');
         }, {
             greetings: 'Bottleship WebClient',
             name: 'bottleship_terminal',
@@ -85,7 +97,7 @@
     });
     </script>
 </head>
-<body>
+<body class="full">
 <div class="container">
     <div class="jumbotron">
         <h1 class="display-3 text-center">Bottleship Web Client</h1>
