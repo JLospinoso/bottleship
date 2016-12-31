@@ -12,6 +12,12 @@ There are two components to Bottleship: the game server and the client. You may 
 Docker container, e.g.:
 
 ```sh
+docker run -p 8000:8000 jaarky/bottleship:latest ./bottleship
+```
+
+or
+
+```sh
 docker run -p 8000:8000 quay.io/jaarky/bottleship:latest ./bottleship
 ```
 
