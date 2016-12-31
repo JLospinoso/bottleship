@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install git cmake g++ libleveldb-dev libboost-system-dev libboost-filesystem-dev libwebsocketpp-dev -y
 RUN mkdir /bottleship
