@@ -9,10 +9,8 @@ dependencies:
 compile:
   override:
     - docker build --rm=false -t jaarky/bottleship:latest .
-    - id=$(docker create jaarky/bottleship:latest)
-    - docker cp $id:/bottleship/bin - > $CIRCLE_ARTIFACTS
-    - docker rm -v $id
+    - docker cp $(docker create jaarky/bottleship:latest):/bottleship/bin - > $CIRCLE_ARTIFACTS/bin.tar
 
 test:
   override:
-    - ./bin/tst
+    - echo "Hello, world!"
