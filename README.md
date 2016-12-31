@@ -15,7 +15,7 @@ Docker container, e.g.:
 docker run -p 8000:8000 quay.io/jaarky/bottleship:latest ./bottleship
 ```
 
-By default, `bottleship` listens on `:8000`. You may interact with the gameserver with the [web client](http://htmlpreview.github.io/?https://raw.githubusercontent.com/jaarky/bottleship/master/web/web-client.html).
+By default, `bottleship` listens on `:8000`. You may interact with the gameserver with the [web client](http://htmlpreview.github.io/?https://raw.githubusercontent.com/jaarky/bottleship/master/web/webclient.html).
 
 Getting Involved
 ==
